@@ -97,7 +97,6 @@ def pick_camera(requested):
 
 
 def open_camera(args):
-    """Open the physical webcam; if it's busy (e.g. OBS holds it) explain and keep retrying."""
     index, name = pick_camera(args.camera)
     warned = False
     while True:

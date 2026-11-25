@@ -52,7 +52,6 @@ class CloudEffect:
         return np.clip((level * (1 + width) - self.noise) * (1 / width), 0, 1)
 
     def burst(self, mask, count):
-        """Spawn `count` cloud puffs at random points inside the person mask."""
         small = mask[::8, ::8]
         ys, xs = np.nonzero(small > 0.5)
         if len(xs) == 0:
@@ -81,7 +80,6 @@ class CloudEffect:
         return self.cache[key]
 
     def update_and_render(self, img):
-        """Advance particles and draw them onto img (uint8 BGR). Returns the new image."""
         self.tick += 1
         if not self.particles:
             return img

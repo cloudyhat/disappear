@@ -9,8 +9,6 @@ DEFAULT_NAMES = {"vanish": "open palm", "appear": "fist"}
 
 
 def normalize(lm, handedness=None):
-    """21 landmarks -> (21,2) array, wrist at origin, scaled by palm length.
-    Left hands are mirrored so a gesture works with either hand."""
     pts = np.array([[p.x, p.y] for p in lm], dtype=np.float32)
     pts -= pts[0]
     scale = np.linalg.norm(pts[9]) or 1.0          # wrist -> middle-finger base
@@ -21,7 +19,6 @@ def normalize(lm, handedness=None):
 
 
 def fingers_up(pts):
-    """[thumb, index, middle, ring, pinky] extended flags from normalized points."""
     d = lambda a, b: np.linalg.norm(pts[a] - pts[b])
     flags = [d(4, 5) > d(3, 5) * 1.15]
     for tip, pip in ((8, 6), (12, 10), (16, 14), (20, 18)):

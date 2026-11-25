@@ -15,7 +15,6 @@ def _segmenter(path, mode):
 
 
 class QualityWorker(threading.Thread):
-    """Runs the multiclass model (background/hair/body/face/clothes/other) on the newest frame."""
 
     def __init__(self, path):
         super().__init__(daemon=True)
@@ -68,8 +67,6 @@ class PersonMasker:
         self.min_blob = 0.002 * self.pw * self.ph
 
     def compute(self, mp_img, rgb, ts):
-        """Returns (soft, guard): soft = 0..1 full-res cover mask; guard = uint8 half-res area
-        that must NOT be used to update the background (person + wide safety margin)."""
         fast = self.fast.segment_for_video(mp_img, ts).confidence_masks[0].numpy_view()
         prob = cv2.resize(fast.reshape(self.h, self.w), (self.pw, self.ph), interpolation=cv2.INTER_AREA)
 
@@ -105,10 +102,6 @@ class PersonMasker:
 
 
 class LightMatcher:
-    """Webcams auto-adjust exposure / white balance (e.g. when you walk in wearing dark clothes),
-    so the saved background no longer matches the live image -> a dark/bright 'shadow' of you.
-    This measures the live/background brightness ratio per colour channel in the visible area
-    around you, spreads it smoothly into the hidden area, and corrects the background with it."""
 
     def __init__(self, w, h, grid_w=160):
         self.w, self.h = w, h
@@ -117,8 +110,6 @@ class LightMatcher:
 
     @staticmethod
     def _pull_push(val, wt):
-        """Fill cells with weight 0 by smooth interpolation from cells with weight 1
-        (pyramid 'pull-push': exact at known cells, membrane-smooth inside holes)."""
         vals, wts = [val * wt[..., None]], [wt]
         while min(wts[-1].shape) > 4:
             vals.append(cv2.pyrDown(vals[-1]))
@@ -134,8 +125,6 @@ class LightMatcher:
         return est
 
     def correct(self, frame, background, soft):
-        """frame uint8, background float32, soft = full-res hide mask (0..1).
-        Returns the lighting-matched background as uint8."""
         size = (self.gw, self.gh)
         f = cv2.resize(frame, size, interpolation=cv2.INTER_AREA).astype(np.float32)
         b = cv2.resize(background, size, interpolation=cv2.INTER_AREA)
