@@ -60,20 +60,3 @@ python disappear.py --no-light-match    # turn off the exposure / lighting corre
 python disappear.py --no-vcam           # preview window only
 python disappear.py --mirror-vcam       # send a mirrored image to the meeting
 ```
-
-## How it works
-
-- **Hands:** MediaPipe Hand Landmarker finds 21 points per hand. Each pose is centred on the wrist and scaled by palm size, and left hands are mirrored. A custom gesture matches when its average point distance to one of your recorded samples is below the threshold.
-- **Person:** two MediaPipe models are combined. The fast Selfie Segmenter runs on every frame. The more accurate multiclass model (hair, body, face, clothes) runs in a background thread. The mask fades out slowly instead of dropping on a bad frame. Holes are filled and a margin is added, so no see-through ghost or hair strands are left.
-- **Background capture:** after the countdown, only pixels where no person is detected go into the average.
-- **Vanish:** the saved background replaces the masked area. With `cloud` or `dissolve`, a noise pattern makes you disappear in patches instead of all at once.
-- **Cloud:** a particle system spawns lumpy smoke puffs inside your silhouette. The puffs rise, drift, expand and fade.
-- **Lighting match:** webcams change exposure and white balance automatically, for example when you walk in wearing dark clothes. The saved background then looks darker or lighter than the live picture, which leaves a "shadow" of you. Every frame, the program compares the live picture with the saved background in the visible area around you. It spreads that per-colour brightness correction smoothly across the hidden area and applies it to the background.
-- **Output:** `pyvirtualcam` sends the frames to OBS Virtual Camera.
-
-
-## Tips
-
-- Keep the camera still. If it moves, press **B** again.
-- Use steady lighting and keep your shadow off the background.
-- Re-capture the background (**B**) whenever the room changes.
